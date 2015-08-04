@@ -5,6 +5,8 @@
 #include <iostream>
 #include <assert.h>
 
+using namespace std;
+
 
 /**
  * A simple RGB color struct with [0,1] floating point values for each color channel
@@ -36,6 +38,34 @@ class RGBColor {
   }
 };
 
+/* THIS STRUCT AUTHORED BY BRADEN KATZMAN
+* A grayscale struct that can be used to convert a simple RGB struct
+* into its corresponding grayscale value. This uses a luminosity method
+* to compute a grayscale. This method averages the values and, "forms a
+weighted average to account for human perception.  We're more sensitive to
+green than other colors, so green is weighted most heavily. The formula
+for luminosity is (0.21 * RED) + (0.72 * GREEN) + (0.07 * B)."
+*
+* Method adapted from:
+* http://www.johndcook.com/blog/2009/08/24/algorithms-convert-color-grayscale/
+*/
+class GrayscaleColor {
+  public:
+    float g;
+
+    GrayscaleColor(float red, float green, float blue) {
+      g = (0.21f * red) + (0.72f * green) + (0.07f * blue);
+    }
+
+    GrayscaleColor(float _g) {
+      g = _g;
+    }
+
+    GrayscaleColor() {
+      g = 0.f;
+    }
+};
+
 /**
  * An image class, adapted from libST's STImage.
  * The class stores colors in RGB form and can load and write PNG files.
@@ -51,6 +81,7 @@ class SimpleImage {
 
   // Constructors
   SimpleImage(const SimpleImage& img);
+  SimpleImage(int width, int height, const GrayscaleColor& g);
   SimpleImage(int width, int height, const RGBColor& bg);
   SimpleImage(int width, int height, unsigned char* data);
   SimpleImage(const std::string& filename);
@@ -79,6 +110,13 @@ class SimpleImage {
     _data[_width * y + x] = c;
   }
 
+  // Set value of pixel at (x, y) to grayscale color. NOTE: clamps x and y to be within image.
+  void setG(int x, int y, GrayscaleColor g) {
+    x = (x >= 0) ? ((x < _width) ? x : _width - 1) : 0;
+    y = (y >= 0) ? ((y < _height) ? y : _height - 1) : 0;
+    _dataG[_width * y + x] = g;
+  }
+
   // Load image from filename
   void load(const std::string& filename);
   
@@ -103,8 +141,16 @@ class SimpleImage {
     return _data;
   }
 
+  /* AUTHORED BY BRADEN KATZMAN
+   * Return pointer to grayscale data array
+   */
+  GrayscaleColor* dataG() const {
+    return _dataG;
+  }
+
  private:
   RGBColor* _data;
+  GrayscaleColor* _dataG;
   int _width;
   int _height;
 
