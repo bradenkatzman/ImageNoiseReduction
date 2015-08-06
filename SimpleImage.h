@@ -64,6 +64,13 @@ class GrayscaleColor {
     GrayscaleColor() {
       g = 0.f;
     }
+
+    GrayscaleColor& operator=(const GrayscaleColor& _g) {
+        g = _g.g;
+        return *this;
+    }
+
+
 };
 
 /**
