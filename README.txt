@@ -10,3 +10,39 @@ stb_image_write.h
 
 CURRENT STATE OF PROGRAM:
 Filters an image 5 times to produce a noise reduced image
+
+HOW TO RUN THE PROGRAM:
+Compile using the Makefile, then run the following command:
+./noise images/IMAGE.ext
+
+-Either add your own images to the "image" directory or use one of the three provided (birds.png, girl.png, man.png) with the correct file extension. The filtered image will show up in the root directory upon completion of the program and will be called "result.png"
+
+-To clean the entire directory (result image and executable) run the following command:
+make clean
+
+-To just remove the result image to run the executable with a different source image, run the following command:
+make rmresult
+
+Noise Reduction Write Up and Documentation:
+In this part of the project, we implemented a noise reduction algorithm based on a research paper availabe in the International Journal of Computer Science Issues called "A Novel Approach to Fast Image Filtering Algorithm of Infrared Images based on Intro Sort Algorithm." We used this as a basis for understanding the process of reducing noise, and then pulled out methods used on infrared images and adapted them to fit a broader range of images that could include color. As we learned in this research paper, this technique can be used to process images and or videos on recording devices which may capture noisy images, or used to process and touch up pixels from a camera that may have dead pixels.
+
+The general method described in our paper that we employed on this part of our project is to filter an entire image in 3x3 rows of pixels. We used SimpleImage from A2 to be able to load an image, and go through the entire image pixel by pixel. At each pixel, we made our current x,y the center of our 3x3 filter window. Within this window, we then process the RGB values channel by channel to help determine which pixels we should consider noisy. Our initial research showed us that noisy pixels are random variation of brightness or color information that usually results in pixels that appear like "pepper" i.e. black and white specks. We used this information to determine that the pixels that we would need to detect are those that were either a black or white pixel, meaning their 3 color channels would have all high values or all low values.
+
+The method that the research paper describes converts each pixel in the filter window to a grayscale value, and then determines if the central pixel is equal to the maximum or minimum grayscale values in the window. If so, it is considered noisy and it must be replaced with the median grayscale value in the window. Implementing this method was our initial approach to this problem, but we ran into two problems:
+1. In extremely noisy images, the filter window would at times be processing a window which was made up of 9 noisy pixels, and it could not determine that the central pixel was noisy and should be replaced because all of the pixels had the same grayscale value.
+2. When we determined the central pixel was noisy (in windows that weren't full of noisy pixels), we had trouble figuring out how to replace that noisy pixel - determined by it's grayscale value in comparison to others, back to a color equivalent median value.
+
+To solve these two problems, we took a different approach to computing grayscales, and instead processed the window per channel (RGB). We did this because we knew, as noted previously, that our "noisy" black or white pixels would have full or no color values per channel. This method proved successful. After adding each color channel to a vector and then sorting them in ascending order, we compared our central pixel's channel to the maximum and minimum value in the vectors. If they had equal values, we deemed this channel to be noisy and replaced it with the median value in the vector, if they did not had equal values, we kept the central pixel's channel as is and set the resulting pixel to the source value.
+
+We were very pleased with the images we produced. We knew that there would be a tradeoff in using this algorithm in that it would make our images more blurry, but knew that this was a factor in most noise reduction techniques. We found that running this algorithm on lower resolution images resulted in much more noticeable blur than in images of much higher resolution where blur was not detectable by our eyes.
+
+The final problem we faced that proved to be outside of the scope of our method was how to process areas of noise whose consecutive noisy pixel area exceeded our filter window. Our method cannot detect these areas and replace them, because the underlying colors are not available and trying to replace them with other sections of the image can result in image errors that we did not want to produce. The method works extremely well on noise that is disjoint, removing almost every noisy pixel. We are particularly proud of our rendering of birds.png in our included "Result Images" directory. This is the highest resolution image we tested (approx. 3000x2000) and the original image contains so much noise in the background. After running our algorithm, almost all of the noise is removed and the images looks much cleared (see birdsReduce.png).
+
+
+
+
+
+The research paper described above can be found at this link:
+http://arxiv.org/pdf/1201.3972.pdf
+
+Our result images can be found in the "Result Images" directory. Both manOriginal.png and girlOriginal.png are smaller images that result in a noticeable blur when the algorithm is produced, though the noise is sufficiently removed. As noted above, birdsOriginal.png is a much larger image with considerable more noise and the image is filtered wonderfully, with the resulting image containing little to no detectable blur with almost all of the noise removed. 
