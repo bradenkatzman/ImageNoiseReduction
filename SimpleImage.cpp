@@ -19,32 +19,30 @@ _height(0) {
 /* EDITED BY BRADEN KATZMAN
  * This updated initializer will set the _dataG array
  */
-SimpleImage::SimpleImage(int width, int height, const GrayscaleColor& g) {
+// SimpleImage::SimpleImage(int width, int height, const GrayscaleColor& g) {
   
-  _width = width;
-  _height = height;
-  _dataG = new GrayscaleColor[_width * _height];
-
-  for (int i = 0; i < _width; i++) {
-    for (int j = 0; j < _height; j++) {
-      _dataG[j * _width + i] = g;
-    }
-  }
-}
-
-// SimpleImage::SimpleImage(int width, int height, const RGBColor& bg):
-//   _width(width),
-//   _height(height) {
-//   _data = new RGBColor[_width * _height];
-
-//     cout << "this one" << endl;
+//   _width = width;
+//   _height = height;
+//   _dataG = new GrayscaleColor[_width * _height];
 
 //   for (int i = 0; i < _width; i++) {
 //     for (int j = 0; j < _height; j++) {
-//       _data[j * _width + i] = bg;
+//       _dataG[j * _width + i] = g;
 //     }
 //   }
 // }
+
+SimpleImage::SimpleImage(int width, int height, const RGBColor& bg):
+  _width(width),
+  _height(height) {
+  _data = new RGBColor[_width * _height];
+
+  for (int i = 0; i < _width; i++) {
+    for (int j = 0; j < _height; j++) {
+      _data[j * _width + i] = bg;
+    }
+  }
+}
 
 SimpleImage::SimpleImage(const SimpleImage& img) {
   _width = img.width();
@@ -134,41 +132,41 @@ void SimpleImage::load(const string& filename) {
 /* EDITED BY BRADEN KATZMAN
  * This updated save method will save the grayscale colors to the image
  */
- bool SimpleImage::save(const string& filename) {
-  // Transform the data into unsigned chars
-  unsigned char* charData = (unsigned char*)std::malloc(_width * _height);
-  GrayscaleColor* pixels = _dataG;
-  for (int i = 0; i < _width * _height; ++i) {
-    charData[i] = (unsigned char)(pixels[i].g * 255.0f);
-  }
-
-  int success = stbi_write_png(filename.c_str(), _width, _height, 1, charData, _width);
-  std::free(charData);
-  if (!success) {
-    fprintf(stderr, "SimpleImage::save() - Could not save '%s'.\n",
-      filename.c_str());
-    return false;
-  }
-  return true;
-}
-
-// bool SimpleImage::save(const string& filename) {
-//   int channels = 3;
+//  bool SimpleImage::save(const string& filename) {
 //   // Transform the data into unsigned chars
-//   unsigned char* charData = (unsigned char*)std::malloc(_width * _height * channels);
-//   RGBColor* pixels = _data;
+//   unsigned char* charData = (unsigned char*)std::malloc(_width * _height);
+//   GrayscaleColor* pixels = _dataG;
 //   for (int i = 0; i < _width * _height; ++i) {
-//     charData[i * 3 + 0] = (unsigned char)(pixels[i].r * 255.0f);
-//     charData[i * 3 + 1] = (unsigned char)(pixels[i].g * 255.0f);
-//     charData[i * 3 + 2] = (unsigned char)(pixels[i].b * 255.0f);
+//     charData[i] = (unsigned char)(pixels[i].g * 255.0f);
 //   }
 
-//   int success = stbi_write_png(filename.c_str(), _width, _height, channels, charData, _width * channels);
+//   int success = stbi_write_png(filename.c_str(), _width, _height, 1, charData, _width);
 //   std::free(charData);
 //   if (!success) {
 //     fprintf(stderr, "SimpleImage::save() - Could not save '%s'.\n",
-//             filename.c_str());
+//       filename.c_str());
 //     return false;
 //   }
 //   return true;
 // }
+
+bool SimpleImage::save(const string& filename) {
+  int channels = 3;
+  // Transform the data into unsigned chars
+  unsigned char* charData = (unsigned char*)std::malloc(_width * _height * channels);
+  RGBColor* pixels = _data;
+  for (int i = 0; i < _width * _height; ++i) {
+    charData[i * 3 + 0] = (unsigned char)(pixels[i].r * 255.0f);
+    charData[i * 3 + 1] = (unsigned char)(pixels[i].g * 255.0f);
+    charData[i * 3 + 2] = (unsigned char)(pixels[i].b * 255.0f);
+  }
+
+  int success = stbi_write_png(filename.c_str(), _width, _height, channels, charData, _width * channels);
+  std::free(charData);
+  if (!success) {
+    fprintf(stderr, "SimpleImage::save() - Could not save '%s'.\n",
+            filename.c_str());
+    return false;
+  }
+  return true;
+}

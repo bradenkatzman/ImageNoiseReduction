@@ -5,4 +5,7 @@ noise: noise.cpp stb.cpp SimpleImage.cpp SimpleImage.h stb_image.h stb_image_wri
 	$(CC) $(CFLAGS) noise.cpp stb.cpp SimpleImage.cpp -o noise
 
 clean:
-	rm noise noiseReduce.png
+	rm noise result.png
+
+rmresult:
+	rm result.png

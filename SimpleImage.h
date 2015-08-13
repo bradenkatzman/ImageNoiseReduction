@@ -13,7 +13,7 @@ using namespace std;
  */
 class RGBColor {
  public:
-  float r, g, b;
+  float r, g, b, gray;
 
   RGBColor(float red, float green, float blue) :
     r(red),
@@ -64,6 +64,16 @@ class GrayscaleColor {
     GrayscaleColor() {
       g = 0.f;
     }
+
+    GrayscaleColor& operator=(const GrayscaleColor& _g) {
+        g = _g.g;
+        return *this;
+    }
+
+    bool operator < (const GrayscaleColor& g1) const {
+      return (g < g1.g);
+    }
+
 };
 
 /**
