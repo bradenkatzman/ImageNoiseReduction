@@ -1,6 +1,7 @@
 #include "SimpleImage.h"
 #include <vector>
 #include <algorithm> 
+#include <string>
 
 using namespace std;
 
@@ -8,31 +9,26 @@ static vector<float> windowR; //the window of red values
 static vector<float> windowG; //the window of green values
 static vector<float> windowB; //the window of blue values
 
-int main(int argc, char** argv) {
-  // Load image from file
-  SimpleImage img(argv[1]);
+SimpleImage& reduceNoise(SimpleImage& source, SimpleImage& result, string fileName) {
 
-  // Initialize result image
-  SimpleImage result(img.width(), img.height(), RGBColor(0, 0, 0));
-
-  // Iterate over pixels and set color for result image
-  for (int y = 0; y < img.height(); ++y) {
-    for (int x = 0; x < img.width(); ++x) {
+    // Iterate over pixels and set color for result image
+  for (int y = 0; y < source.height(); ++y) {
+    for (int x = 0; x < source.width(); ++x) {
 
       windowR.clear();
       windowG.clear();
       windowB.clear();
 
-      RGBColor c = img(x, y); //current pixel
+      RGBColor c = source(x, y); //current pixel
 
       //check if we are at the bounds of the image
-      if (y - 1 > 0 && y + 1 < img.height()
-        && x - 1 > 0 && x + 1 < img.width()) {
+      if (y - 1 > 0 && y + 1 < source.height()
+        && x - 1 > 0 && x + 1 < source.width()) {
         //we'll filter the image in 3x3 windows
         for (int y1 = -1; y1 < 2; ++y1) {
           for (int x1 = -1; x1 < 2; ++x1) {
               //these loops keep our central pixel at the current x,y
-            RGBColor tempC = img(x+x1, y+y1);
+            RGBColor tempC = source(x+x1, y+y1);
 
               //add values to RGB
             windowR.push_back(tempC.r);
@@ -88,18 +84,37 @@ int main(int argc, char** argv) {
     }
   }
   // Save result image to file
-  result.save("noiseReduce.png");
+  result.save(fileName);
+  
+
+  return result;
+}
+
+int main(int argc, char** argv) {
+  // Load image from file
+  SimpleImage img(argv[1]);
+
+  //initialize intermediate images
+  SimpleImage intermediate1(img.width(), img.height(), RGBColor(0, 0, 0));
+  SimpleImage intermediate2(img.width(), img.height(), RGBColor(0, 0, 0));
+  SimpleImage intermediate3(img.width(), img.height(), RGBColor(0, 0, 0));
+  SimpleImage intermediate4(img.width(), img.height(), RGBColor(0, 0, 0));
+
+  // Initialize result image
+  SimpleImage result(img.width(), img.height(), RGBColor(0, 0, 0));
+
+  //set up file names
+  string intd1 = "intermediate1.png";
+  string intd2 = "intermediate2.png";
+  string intd3 = "intermediate3.png";
+  string intd4 = "intermediate4.png";
+  string resultFile = "result.png";
+
+  reduceNoise(img, intermediate1, intd1);
+  reduceNoise(intermediate1, intermediate2, intd2);
+  reduceNoise(intermediate2, intermediate3, intd3);
+  reduceNoise(intermediate3, intermediate4, intd4);
+  reduceNoise(intermediate4, result, resultFile);
 
   return 0;
 }
-
-int reduceNoise() {
-  
-}
-
-
-/* median filtering:
-  take 3x3 window, compute the median value of R, G, B --> replace central pixel with median color
-  */
-
-  // bilateral filtering
