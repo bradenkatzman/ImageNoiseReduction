@@ -9,7 +9,7 @@ static vector<float> windowR; //the window of red values
 static vector<float> windowG; //the window of green values
 static vector<float> windowB; //the window of blue values
 
-SimpleImage& reduceNoise(SimpleImage& source, SimpleImage& result, string fileName) {
+int reduceNoise(SimpleImage& source, SimpleImage& result) {
 
     // Iterate over pixels and set color for result image
   for (int y = 0; y < source.height(); ++y) {
@@ -83,11 +83,8 @@ SimpleImage& reduceNoise(SimpleImage& source, SimpleImage& result, string fileNa
       }
     }
   }
-  // Save result image to file
-  result.save(fileName);
-  
 
-  return result;
+  return 0;
 }
 
 int main(int argc, char** argv) {
@@ -103,18 +100,14 @@ int main(int argc, char** argv) {
   // Initialize result image
   SimpleImage result(img.width(), img.height(), RGBColor(0, 0, 0));
 
-  //set up file names
-  string intd1 = "intermediate1.png";
-  string intd2 = "intermediate2.png";
-  string intd3 = "intermediate3.png";
-  string intd4 = "intermediate4.png";
-  string resultFile = "result.png";
+  reduceNoise(img, intermediate1);
+  reduceNoise(intermediate1, intermediate2);
+  reduceNoise(intermediate2, intermediate3);
+  reduceNoise(intermediate3, intermediate4);
+  reduceNoise(intermediate4, result);
 
-  reduceNoise(img, intermediate1, intd1);
-  reduceNoise(intermediate1, intermediate2, intd2);
-  reduceNoise(intermediate2, intermediate3, intd3);
-  reduceNoise(intermediate3, intermediate4, intd4);
-  reduceNoise(intermediate4, result, resultFile);
+    // Save result image to file
+  result.save("result.png");
 
   return 0;
 }

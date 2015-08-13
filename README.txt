@@ -9,4 +9,4 @@ stb_image_write.h
 
 
 CURRENT STATE OF PROGRAM:
-Converts any image to it's grayscale equivalent at every pixel
+Filters an image 5 times to produce a noise reduced image
